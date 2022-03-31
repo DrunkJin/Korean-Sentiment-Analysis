@@ -629,6 +629,10 @@ def recomend_sys(new_sentence):
 
 
 # 결과물
+
+**아래 이미지 클릭시 유투브로 이동하여 재생됩니다.**
+
+
 [![한국어 대화기반 감성분석](http://img.youtube.com/vi/f7kOvVcNzTA/0.jpg)](https://youtu.be/f7kOvVcNzTA) 
 
 
