@@ -490,6 +490,8 @@ bilstm도 돌리다가 모델저장파일명을 안바꿨지만..
 
 솔직히 다이나믹한 추천시스템은 시간부족으로 만들지 못했다. 그냥 리스트에 다양한 항목을 넣고 감정점수에 따라서 아이템을 추천하는 방식으로 만들어보았다.
 
+리스트는 설명에 필요한 정도로 다 삭제해주었다.
+만약 추가하고자한다면 다른 항목을 넣어주면 된다.
 
 ```python
 from tensorflow.keras.models import load_model
@@ -516,227 +518,26 @@ global score
 corpus = []
 avg_emo = 0
 
+heal = ['여수 밤바다', '파주 평화누리공원']
+extreme= ['통영 어드벤처 타워', '제주도  스쿠버다이빙']
+movie=['루카','콰이어트 플레이스']
 
-
-
-heal = ['여수 밤바다', '파주 평화누리공원', '순천 갈대밭', '제주도 영실코스', 
-         '진주 진양호', '장흥유원지', '대구 앞산정만대', '춘천 해피초원농장' ,' 속초 해수욕장', 
-         '경주 불국사', '포항 호미곶', '남해 두모마을', '대관령 하늘목장', '군산 철길마을', 
-         '국립 광릉수목원', '금선사 템플스테이', '보성 제암산자연휴양림','군산 선유도']
- 
-extreme= ['통영 어드벤처 타워', '제주도  스쿠버다이빙', '단양 패러글라이딩', 
-          '강원 내린천 래프팅', '충주 스카이다이빙', '하남 스포츠몬스터', '서울 한강 워터 제트팩', 
-          '일산 인공 서핑', '영월 동강래프팅', '여수 스카이플라이', '문경 패러글라이딩', 
-          '경남 하동 하동알프스레포츠', '인천 스카이 짚라인', '강화 루지']
- 
-movie=['루카','콰이어트 플레이스','크루엘라','컨저링 3:악마가 시켰다','여고괴담 여섯번째 이야기','분노의 질주: 더 얼티메이트','캐시트럭',
-'클라이밍',
-'그 여름, 가장 차가웠던',
-'폭력의 그림자',
-'청춘 선거',
-'그레타 툰베리',
-'낫아웃',
-'마세티 킬즈',
-'프로페서 앤 매드맨',
-'화이트 온 화이트',
-'아야와 마녀',
-'까치발',
-'플래시백',
-'애플',
-'혼자 사는 사람들',
-'강호아녀',
-'파이프라인',
-'분노의 질주']
- 
-#음악 (네이버 바이브 참고 1위~20위)
- 
-k_balad=['Timeless-SG워너비',
-'추적이는 여름 비가 되어-장범준',
-'밤하늘의 별을 (2020)-경서',
-'어떻게 이별까지 사랑하겠어, 널 사랑하는 거지-AKMU (악동뮤지션)',
-'내 입술 따뜻한 커피처럼-청하 Colde(콜드)',
-'서울의 잠 못 이루는 밤 (Feat. 이수현)-10CM',
-'잠이 오질 않네요-장범준',
-'I Love U-성시경',
-'내사람 (Partner For Life)-SG워너비',
-'취기를 빌려-산들',
-'안녕 (Hello)-조이',
-'밤편지-아이유(IU)',
-'Anti-Romantic-투모로우바이투게더',
-'너의 모든 순간-성시경',
-'좋을텐데 (If Only) (Feat. 폴킴)-조이',
-'봄 안녕 봄-아이유(IU)',
-'Love poem -아이유(IU)',
-'아이와 나의 바다-아이유(IU)',
-'벌써 일년-반하나& MJ(써니사이드)',
-'이렇게 좋아해 본 적이 없어요 -CHEEZE (치즈)'
-]
- 
-k_dance=[
-'Butter-방탄소년단',
-'Next Level-aespa',
-'Dun Dun Dance-오마이걸(OH MY GIRL)',
-'치맛바람 (Chi Mat Ba Ram)-브레이브걸스(Brave Girls)',
-'Alcohol-Free-TWICE(트와이스)',
-"롤린 (Rollin')-브레이브걸스(Brave Girls)",
-'라일락-아이유(IU)',
-'ASAP-STAYC(스테이씨)',
-'Dynamite-방탄소년단',
-'상상더하기-MSG워너비',
-'Celebrity-아이유(IU)',
-'상상더하기-라붐(LABOUM)',
-'Ready to love-세븐틴',
-'Dolphin-오마이걸(OH MY GIRL)',
-'Lovesick Girls-BLACKPINK',
-'Pool Party (Feat. 이찬 of DKB)-브레이브걸스(Brave Girls)',
-"Heaven's Cloud-세븐틴",
-'체념-정상동기(김정수, 정기석, 이동휘, 이상이)',
-'어푸 (Ah puh)-아이유(IU)',
-]
- 
-k_hip=[
-'마.피.아. In the morning-ITZY(있지)',
-'봄날-방탄소년단',
-'Life Goes On-방탄소년단',
-'맛 (Hot Sauce)-NCT DREAM',
-'밸런스 게임-투모로우바이투게더',
-'GAM3 BO1-세븐틴',
-'비도 오고 그래서 (Feat. 신용재)-헤이즈 (Heize)',
-'METEOR-창모(CHANGMO)',
-'DNA-방탄소년단',
-'IDOL-방탄소년단',
-'FAKE LOVE-방탄소년단',
-'피 땀 눈물-방탄소년단',
-'사이렌-호미들',
-'멜로디-ASH ISLAND',
-'I NEED U-방탄소년단',
-'아무노래-지코 (ZICO)',
-'어떻게 지내 (Prod. By VAN.C)-오반(OVAN)',
-'Rainy day (Feat. ASH ISLAND, Skinny Brown)-PATEKO(파테코)',
-'뚜두뚜두 (DDU-DU DDU-DU)-BLACKPINK']
- 
- 
-trt=[
-'이제 나만 믿어요-임영웅',
-'별빛 같은 나의 사랑아-임영웅',
-'다시 사랑한다면 (김필 Ver.)-임영웅',
-'HERO-임영웅',
-'미워요-임영웅',
-'잊어야 한다는 마음으로-임영웅',
-'계단말고 엘리베이터-임영웅',
-'소나기-임영웅',
-'바보같지만-임영웅',
-'따라따라-임영웅',
-'당신-임영웅',
-'내 마음 별과 같이-임영웅',
-'고맙소-김호중',
-'만개 (Prod. 신지후)-김호중',
-'나보다 더 사랑해요-김호중',
-'애인이 되어줄게요 (Prod. 알고보니, 혼수상태)-김호중',
-'퇴근길-김호중',
-'할무니-김호중',
-'우산이 없어요-김호중',
-'천년의 사랑-김호중'
-]
- 
- 
-f_dance=[
-'You-Regard, Troye Sivan, Tate McRae',
-'Closer (Feat. Halsey)-The Chainsmokers',
-'Faded-Alan Walker',
-'One Kiss-Calvin Harris, Dua Lipa',
-'Heartbreak Anthem-Galantis, David Guetta, Little Mix',
-'Something Just Like This-The Chainsmokers, Coldplay',
-'This Is What You Came For (Feat. Rihanna)-Calvin Harris',
-'The Middle-Zedd, Grey, Maren Morris',
-'Symphony (Feat. Zara Larsson)-Clean Bandit',
-'Wake Me Up-Avicii',
-'Waste It On Me (Feat. BTS(방탄소년단))-Steve Aoki',
-'How To Love (Feat. Sofia Reyes)-Cash Cash',
-'Bad Boy (with Wiz Khalifa, bbno$, MAX)-Yung Bae, Wiz Khalifa, bbno$, MAX',
-'Titans (Feat. Sia & Labrinth) (Imanbek Remix)-Major Lazer',
-'Feels (Feat. Pharrell Williams, Katy Perry, Big Sean)-Calvin Harris',
-'Rise (Feat. Jack & Jack)-Jonas Blue',
-'Mama (Feat. William Singe)-Jonas Blue',
-'Just Got Paid (Feat. French Montana)-Sigala, Ella Eyre, Meghan Trainor',
-'Love Line-Shift K3y, Tinashe',
-'Lonely Together (Feat. Rita Ora)-Avicii'
-]
- 
-newage=[
-'River Flows In You-이루마',
-'Letter From The Earth (지구에서 온 편지)-김광민',
-'익숙한 그 집 앞-유희열',
-'처음부터 지금까지 (Inst.)-박정원',
-'냉정과 열정 사이 OST (冷靜と情熱のあいだ)-Ryo Yoshimata',
-'''Tomorrow's Promise-Kevin Kern''',
-"Mia & Sebastian's Theme-Justin Hurwitz",
-'Recuerods de la Alhambra (알함브라 궁전의 추억)-Claude Ciari',
-'''Gabriel's Oboe-Ennio Morricone''',
-'Rain-Ryuichi Sakamoto',
-'Romance-Yuhki Kuramoto',
-'Second Romance-Yuhki Kuramoto',
-'Crystal Rainbow-데이드림(Daydream)',
-'My Road (Live)-Lee Oskar',
-'Last Carnival-Acoustic Cafe',
-'Return To The Heart-David Lanz',
-'Adagio-Secret Garden',
-'Loving You-Kenny G'
-]
-
-korean = ["삼계탕", "삼겹살", "곱창", "찜닭", "오리고기", "소고기", 
-          "국밥", "닭도리탕", "낙곱새", "라면", "비빔밥", "칼국수", 
-          "수제비", "갈비", "제육볶음"]
-
-western = ["스테이크", "파스타", "필라프", "감바스", "리조또", "샐러드", 
-           "피자", "빠에야", "플래터", "스튜"]
-
-asian = ["짜장면", "뿌팟퐁커리", "팟타이", "나시고랭", "쌀국수", "미고랭",
-         "카레", "마라탕", "마라샹궈", "훠궈", "돈까스", "월남쌈", "라멘", 
-         "탄탄멘", "규동", "꿔바로우", "똠양꿍", "물냉면"]
-
-spicy = ["떡볶이", "김치찜", "김치찌개", "감자탕", "짬뽕", "닭발", "부대찌개",
-         "순두부찌개", "아구찜", "해물찜", "육개장", "낙지볶음", "쭈꾸미", 
-         "돼지갈비찜", "소꼬리찜", "비빔냉면"]
-
-dessert = ["와플", "마카롱", "빙수", "크로크모슈", "케이크", "허니바게트볼",
-           "머쉬룸수프볼", "에그데니쉬", "케이크", "치아바타", "호두파운드케이크",
-           "쿠키", "허니브레드", "오믈렛", "베이글"]
-
-snack = ["닭강정", "양꼬치", "핫윙", "소떡소떡", "가라아게", "콘치즈", "감자튀김", 
-         "치킨너겟", "치킨", "낫쵸", "소시지", "버터구이", "계란찜", "핫도그", 
-         "해쉬브라운"]
-
-coffee = ["아메리카노", "콜드브루", "바닐라 라떼", "카페 라떼", "카라멜 마키아또",
-          "카페 모카", "바닐라 프라페", "카페모카 프라페", "연유 라떼", "화이트 모카",
-          "민트 모카", "헤이즐넛 라떼", "에스프레소", "오곡 프라페", "쿠앤크 프라페"]
-
-beverage = ["초코 라떼", "민트초코 라떼", "밀크티", "흑당 버블티", "레몬차", "자몽차",
-            "유자차", "모히토", "요거트 스무디", "블루베리 스무디", "딸기 스무디", "애플망고 스무디",
-            "레몬 에이드", "자몽 에이드", "생과일 주스"]
-
-motivation = ["자신을 믿어라. 자신의 능력을 신뢰하라. 겸손하지만 합리적인 자신감 없이는 성공할 수도 행복할 수도 없다. - 노먼 빈센트 필",
-"조금 더 많이 인내하자. 조금 더 많이 노력하자. 그러면 절망적 실패로 보였던 것이 빛나는 성공으로 변할 수 있다. - 알버트 휴버드",
-"당신이 인생의 주인공이기 때문이다. 그 사실을 잊지말라. 지금까지 당신이 만들어온 의식적 그리고 무의식적 선택으로 인해 지금의 당신이 있는것이다. - 바바라 홀",
-"먹는 칼로리보다 에너지 소모가 적으면 살이 찌듯이, 걱정만 하고 행동하지 않으면 걱정이 찐다.",
-"이미 끝나버린 일을 후회하기 보다는 하고 싶었던 일을 하지 못한 것을 후회하라 - 탈무드",
-"기회가 주어지면 최선을 다하는 것이 아니라 최선을 다하고 있으면 기회가 주어지는 것이다 - 신영준",
-"낭비한 시간에 대한 후회는 더 큰 시간 낭비이다 - 메이슨 쿨리",
-"성공은 매일 부단하게 반복된 작은 노력의 합산이다.",
-"현명한 사람은 앉아서 손해 본 것을 한탄만 하지 않고 즐겁게 그 손해를 회복할 방법을 찾는다. - 셰익스피어",
-"고통을 주지 않는것은 쾌락도 주지 않는다 - 몽테뉴",
-"시간은 간다",
-"살아가는 사람들 중 대부분은 자신에게 올 기회를 기다리나 기회라는 것은 기다리는 사람에게는 쉽게 오지 않는 법이다",
-"기회를 얻을 수 있게 기다리는 사람이 되기보다는 기회를 얻을 수 있는 실력을 먼저 쌓아야 한다. 자신이 하는 일에 열중하고 노력하다보면 자연스럽게 기회는 찾아온다.",
-"변화를 위해서 가장 중요한 것은 행동하는 첫걸음이다.",
-"무엇이든 하루아침에 만들어지는 것은 없다. 로마 또한 하루아침에 만들어지지 않았다. 이 말은 무언가를 만들기 위해서는 그것을 만들기 위해 노력하고 집중 해야 한다는 것이다.",
-"스스로를 믿고 자신이 가지고 있는 능력을 신뢰해야 한다. 하지만 거만하게 행동하지 말고 겸손해라. 성공을 위해서 자신감이 필요하지만 오만함은 필요하지 않다.",
-             "끝난 일은 언급할 필요가 없으며 지난 일은 허물을 물을 필요가 없다. - 공자",
-"어렵고 힘든 상황일수록 서두르지 말고 침착해라. 성급하게 하는 행동에는 실수가 포함되기 쉽다.",
-"나의 하루를 설명할 수 있는 사람이 곁에 있다는 건 생각보다 기분 좋은 일이야 그러니 너도 생각보다 좋은 사람이지 - 흔글",
-"잠 못 자고 있지, 얼른 자, 걱정하는 일 안 생겨 좋은 일은 아니더라도 아무 일 없을 거야 혼자 있는 새벽을 걱정으로 보내지는 마 - 흔글",
-"봄바람도 살랑살랑 불고 꽃도 예쁘게 피어있으니 얼마나 놀고 싶겠냐만은, 그래도 그 시간들을 이겨내면 너의 인생에 꽃이 필 테니 조금만 참고 바람을 이겨내기를 - 흔글"]
-
+#음악 (네이버 바이브 참고 1위~20위) 
+k_balad=['Timeless-SG워너비','추적이는 여름 비가 되어-장범준']
+k_dance=['Butter-방탄소년단','Next Level-aespa']
+k_hip=['마.피.아. In the morning-ITZY(있지)','봄날-방탄소년단']
+trt=['이제 나만 믿어요-임영웅','별빛 같은 나의 사랑아-임영웅']
+f_dance=['You-Regard, Troye Sivan, Tate McRae','Closer (Feat. Halsey)-The Chainsmokers'
+newage=['River Flows In You-이루마','Letter From The Earth (지구에서 온 편지)-김광민']
+korean = ["삼계탕", "삼겹살"]
+western = ["스테이크", "파스타"]
+asian = ["짜장면", "뿌팟퐁커리"]
+spicy = ["떡볶이", "김치찜"]
+dessert = ["와플", "마카롱"]
+snack = ["닭강정", "양꼬치"]
+coffee = ["아메리카노", "콜드브루"]
+beverage = ["초코 라떼", "민트초코 라떼"]
+motivation = ["{동기부여가 될만한 말들}"]
 category = [heal,extreme,movie,k_balad,k_dance,k_hip,trt,f_dance,newage,korean,western,asian,spicy,dessert,snack,coffee,beverage]
 f8 = [extreme,movie,k_balad,k_dance,k_hip,trt,f_dance,korean,western,asian,spicy,dessert,snack,coffee,beverage]
 f6 = [extreme,movie,k_balad,k_dance,k_hip,trt,f_dance,korean,western,asian,spicy,dessert,snack,coffee,beverage]
